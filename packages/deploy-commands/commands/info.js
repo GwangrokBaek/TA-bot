@@ -8,10 +8,11 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			const userId = interaction.user.id
+			const guildId = interaction.guild.id
 			const now = dayjs()
 			const dayOfWeek = (await dateManager).convertIntToDay(now.day())
-			const timeGoal = await dataManager.getTimeGoal(userId)
-			const stat = await dataManager.getStat(userId)
+			const timeGoal = await dataManager.getTimeGoal(userId, guildId)
+			const stat = await dataManager.getStat(userId, guildId)
 
 			let skipDays = ""
 

@@ -1,29 +1,3 @@
 {
-	"users": [
-		{
-			"userId": "315882174362681346",
-			"timeGoal": 1,
-			"lastJoinTimestamp": "2022-07-15T23:57:14+09:00",
-			"stat": {
-				"thisWeek": {
-					"mon": { "pass": true, "timeReal": null },
-					"tue": { "pass": false, "timeReal": null },
-					"wed": { "pass": "skip", "timeReal": null },
-					"thu": { "pass": false, "timeReal": null },
-					"fri": { "pass": false, "timeReal": 0.38320111111111105 },
-					"sat": { "pass": false, "timeReal": 0 },
-					"sun": { "pass": false, "timeReal": null }
-				},
-				"lastWeek": {
-					"mon": { "pass": false, "timeReal": null },
-					"tue": { "pass": false, "timeReal": null },
-					"wed": { "pass": false, "timeReal": null },
-					"thu": { "pass": false, "timeReal": null },
-					"fri": { "pass": false, "timeReal": null },
-					"sat": { "pass": false, "timeReal": null },
-					"sun": { "pass": false, "timeReal": null }
-				}
-			}
-		}
-	]
+	"users": []
 }

@@ -80,10 +80,10 @@ client.on("interactionCreate", async (interaction) => {
 client.on("voiceStateUpdate", async (oldState, newState) => {
 	if (!oldState.selfVideo && newState.selfVideo) {
 		const now = dayjs().format()
-		setLastJoinTimestamp(newState.id, now)
+		setLastJoinTimestamp(newState.id, newState.guild.id, now)
 	} else if (oldState.selfVideo && oldState.channelId && (!newState.selfVideo || !newState.channelId)) {
 		const now = dayjs()
-		const before = dayjs(await getLastJoinTimestamp(newState.id))
+		const before = dayjs(await getLastJoinTimestamp(newState.id, newState.guild.id))
 		const duration = now - before
 
 		const studyTime = dayjs.duration(duration, "ms").asHours()
@@ -95,34 +95,61 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 			const studyTimeOflastDay = studyTime - studyTimeOfToday
 
 			if (convertIntToDay(today) === "mon") {
-				await addTimeRealToSpecificStat(newState.id, false, "sun", studyTimeOflastDay)
-				if ((await getTimeRealOfSpecificStat(newState.id, false, "sun")) >= getTimeGoal(newState.id)) {
-					await setPassValueOfSpecificStat(newState.id, false, "sun", true)
+				await addTimeRealToSpecificStat(newState.id, newState.guild.id, false, "sun", studyTimeOflastDay)
+				if (
+					(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, false, "sun")) >=
+					getTimeGoal(newState.id, newState.guild.id)
+				) {
+					await setPassValueOfSpecificStat(newState.id, newState.guild.id, false, "sun", true)
 				}
 			} else {
-				await addTimeRealToSpecificStat(newState.id, true, convertIntToDay(today - 1), studyTimeOflastDay)
+				await addTimeRealToSpecificStat(
+					newState.id,
+					newState.guild.id,
+					true,
+					convertIntToDay(today - 1),
+					studyTimeOflastDay
+				)
 				if (
-					(await getTimeRealOfSpecificStat(newState.id, false, convertIntToDay(today - 1))) >=
-					getTimeGoal(newState.id)
+					(await getTimeRealOfSpecificStat(
+						newState.id,
+						newState.guild.id,
+						false,
+						convertIntToDay(today - 1)
+					)) >= getTimeGoal(newState.id, newState.guild.id)
 				) {
-					await setPassValueOfSpecificStat(newState.id, true, convertIntToDay(today - 1), true)
+					await setPassValueOfSpecificStat(
+						newState.id,
+						newState.guild.id,
+						true,
+						convertIntToDay(today - 1),
+						true
+					)
 				}
 			}
 
-			await addTimeRealToSpecificStat(newState.id, true, convertIntToDay(today), studyTimeOfToday)
+			await addTimeRealToSpecificStat(
+				newState.id,
+				newState.guild.id,
+				true,
+				convertIntToDay(today),
+				studyTimeOfToday
+			)
 
 			if (
-				(await getTimeRealOfSpecificStat(newState.id, true, convertIntToDay(today))) >= getTimeGoal(newState.id)
+				(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today))) >=
+				getTimeGoal(newState.id, newState.guild.id)
 			) {
-				await setPassValueOfSpecificStat(newState.id, true, convertIntToDay(today), true)
+				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), true)
 			}
 		} else if (now.isSame(before, "day")) {
-			await addTimeRealToSpecificStat(newState.id, true, convertIntToDay(today), studyTime)
+			await addTimeRealToSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), studyTime)
 
 			if (
-				(await getTimeRealOfSpecificStat(newState.id, true, convertIntToDay(today))) >= getTimeGoal(newState.id)
+				(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today))) >=
+				getTimeGoal(newState.id, newState.guild.id)
 			) {
-				await setPassValueOfSpecificStat(newState.id, true, convertIntToDay(today), true)
+				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), true)
 			}
 		}
 	}
