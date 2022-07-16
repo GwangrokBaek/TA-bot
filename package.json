@@ -8,8 +8,10 @@
 		"node": "18.5.0"
 	},
 	"scripts": {
-		"start": "node .",
-		"deploy:commands": "cd packages/deploy-commands && node .",
+		"start:dev": "cp .env.dev .env && node .",
+		"start:prod": "cp .env.prod .env && node .",
+		"deploy:commands:dev": "cd packages/deploy-commands && cp .env.dev .env && node .",
+		"deploy:commands:prod": "cd packages/deploy-commands && cp .env.prod .env && node .",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "GwangrokBaek",
