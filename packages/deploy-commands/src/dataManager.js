@@ -90,11 +90,12 @@ function setUserTable(userTable) {
 	})
 }
 
-function putUser(userId) {
+function putUser(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
 			newUser = {
 				userId: userId,
+				guildId: guildId,
 				timeGoal: null,
 				lastJoinTimestamp: null,
 				stat: {
@@ -130,12 +131,12 @@ function putUser(userId) {
 	})
 }
 
-function getUser(userId) {
+function getUser(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		let index = 0
 
 		for (const user of userTable.users) {
-			if (user.userId === userId) {
+			if (user.userId === userId && user.guildId === guildId) {
 				resolve({ user: user, index: index })
 				return
 			}
@@ -143,7 +144,7 @@ function getUser(userId) {
 		}
 
 		try {
-			const { newUser, newIndex } = await putUser(userId)
+			const { newUser, newIndex } = await putUser(userId, guildId)
 			resolve({ user: newUser, index: newIndex })
 		} catch (e) {
 			reject(e)
@@ -151,10 +152,10 @@ function getUser(userId) {
 	})
 }
 
-async function setTimeGoal(userId, timeGoal) {
+async function setTimeGoal(userId, guildId, timeGoal) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 			userTable.users[index].timeGoal = timeGoal
 
 			await fs.writeFileSync(userTablePath, JSON.stringify(userTable))
@@ -165,10 +166,10 @@ async function setTimeGoal(userId, timeGoal) {
 	})
 }
 
-async function setLastJoinTimestamp(userId, lastJoinTimestamp) {
+async function setLastJoinTimestamp(userId, guildId, lastJoinTimestamp) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 			userTable.users[index].lastJoinTimestamp = lastJoinTimestamp
 
 			await fs.writeFileSync(userTablePath, JSON.stringify(userTable))
@@ -179,10 +180,10 @@ async function setLastJoinTimestamp(userId, lastJoinTimestamp) {
 	})
 }
 
-async function setThisWeekStat(userId, stat) {
+async function setThisWeekStat(userId, guildId, stat) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 			userTable.users[index].stat.thisWeek = stat
 
 			await fs.writeFileSync(userTablePath, JSON.stringify(userTable))
@@ -193,10 +194,10 @@ async function setThisWeekStat(userId, stat) {
 	})
 }
 
-async function setLastWeekStat(userId, stat) {
+async function setLastWeekStat(userId, guildId, stat) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 			userTable.users[index].stat.lastWeek = stat
 
 			await fs.writeFileSync(userTablePath, JSON.stringify(userTable))
@@ -207,10 +208,10 @@ async function setLastWeekStat(userId, stat) {
 	})
 }
 
-async function setPassValueOfSpecificStat(userId, thisWeek, day, value) {
+async function setPassValueOfSpecificStat(userId, guildId, thisWeek, day, value) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			if (thisWeek === true) {
 				userTable.users[index].stat.thisWeek[day].pass = value
@@ -226,10 +227,10 @@ async function setPassValueOfSpecificStat(userId, thisWeek, day, value) {
 	})
 }
 
-async function getTimeGoal(userId) {
+async function getTimeGoal(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			resolve(userTable.users[index].timeGoal)
 		} catch (e) {
@@ -238,10 +239,10 @@ async function getTimeGoal(userId) {
 	})
 }
 
-async function getLastJoinTimestamp(userId) {
+async function getLastJoinTimestamp(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			resolve(userTable.users[index].lastJoinTimestamp)
 		} catch (e) {
@@ -250,10 +251,10 @@ async function getLastJoinTimestamp(userId) {
 	})
 }
 
-async function getStat(userId) {
+async function getStat(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			resolve(userTable.users[index].stat)
 		} catch (e) {
@@ -262,10 +263,10 @@ async function getStat(userId) {
 	})
 }
 
-async function getThisWeekStat(userId) {
+async function getThisWeekStat(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			resolve(userTable.users[index].stat.thisWeek)
 		} catch (e) {
@@ -274,10 +275,10 @@ async function getThisWeekStat(userId) {
 	})
 }
 
-async function getLastWeekStat(userId) {
+async function getLastWeekStat(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			resolve(userTable.users[index].stat.lastWeek)
 		} catch (e) {
@@ -286,10 +287,10 @@ async function getLastWeekStat(userId) {
 	})
 }
 
-async function getPassValueOfSpecificStat(userId, thisWeek, day) {
+async function getPassValueOfSpecificStat(userId, guildId, thisWeek, day) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			if (thisWeek === true) {
 				resolve(userTable.users[index].stat.thisWeek[day].pass)
@@ -302,10 +303,10 @@ async function getPassValueOfSpecificStat(userId, thisWeek, day) {
 	})
 }
 
-async function getTimeRealOfSpecificStat(userId, thisWeek, day) {
+async function getTimeRealOfSpecificStat(userId, guildId, thisWeek, day) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			if (thisWeek === true) {
 				resolve(userTable.users[index].stat.thisWeek[day].timeReal)
@@ -318,10 +319,10 @@ async function getTimeRealOfSpecificStat(userId, thisWeek, day) {
 	})
 }
 
-async function addTimeRealToSpecificStat(userId, thisWeek, day, timeReal) {
+async function addTimeRealToSpecificStat(userId, guildId, thisWeek, day, timeReal) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const { _, index } = await getUser(userId)
+			const { _, index } = await getUser(userId, guildId)
 
 			if (thisWeek === true) {
 				if (userTable.users[index].stat.thisWeek[day].timeReal === null) {

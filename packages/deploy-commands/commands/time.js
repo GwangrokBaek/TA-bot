@@ -15,12 +15,13 @@ module.exports = {
 		try {
 			const hours = await interaction.options.getNumber("시간")
 			const userId = interaction.user.id
+			const guildId = interaction.guild.id
 
 			if (hours === null) {
 				throw new Error()
 			}
 
-			await dataManager.setTimeGoal(userId, hours)
+			await dataManager.setTimeGoal(userId, guildId, hours)
 			await interaction.reply({
 				content: `하루 목표 공부 시간이 ${hours} 시간으로 설정되었습니다!`,
 				ephemeral: true,

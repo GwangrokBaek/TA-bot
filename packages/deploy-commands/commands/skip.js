@@ -41,7 +41,7 @@ module.exports = {
 		.addSubcommand((subcommand) => subcommand.setName("add").setDescription("쉬는 요일 설정"))
 		.addSubcommand((subcommand) => subcommand.setName("delete").setDescription("쉬는 요일 해제")),
 	async execute(interaction) {
-		const stat = await dataManager.getStat(interaction.user.id)
+		const stat = await dataManager.getStat(interaction.user.id, interaction.guild.id)
 
 		let skipDays = ""
 
@@ -91,7 +91,13 @@ module.exports = {
 		if (interaction.customId === "addskip") {
 			await interaction.deferUpdate()
 			for (const dayInEng of interaction.values) {
-				await dataManager.setPassValueOfSpecificStat(interaction.user.id, true, dayInEng, "skip")
+				await dataManager.setPassValueOfSpecificStat(
+					interaction.user.id,
+					interaction.guild.id,
+					true,
+					dayInEng,
+					"skip"
+				)
 			}
 			await interaction.editReply({
 				content: "성공적으로 등록되었습니다",
@@ -100,8 +106,21 @@ module.exports = {
 		} else if (interaction.customId === "deleteskip") {
 			await interaction.deferUpdate()
 			for (const dayInEng of interaction.values) {
-				if ((await dataManager.getPassValueOfSpecificStat(interaction.user.id, true, dayInEng)) === "skip") {
-					await dataManager.setPassValueOfSpecificStat(interaction.user.id, true, dayInEng, false)
+				if (
+					(await dataManager.getPassValueOfSpecificStat(
+						interaction.user.id,
+						interaction.guild.id,
+						true,
+						dayInEng
+					)) === "skip"
+				) {
+					await dataManager.setPassValueOfSpecificStat(
+						interaction.user.id,
+						interaction.guild.id,
+						true,
+						dayInEng,
+						false
+					)
 				}
 			}
 			await interaction.editReply({
