@@ -4,6 +4,9 @@
 	"description": "",
 	"main": "src/index.js",
 	"type": "module",
+	"engines": {
+		"node": "18.5.0"
+	},
 	"scripts": {
 		"start": "node .",
 		"deploy:commands": "cd packages/deploy-commands && node .",
