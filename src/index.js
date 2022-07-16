@@ -10,6 +10,8 @@ import {
 	setPassValueOfSpecificStat,
 	addTimeRealToSpecificStat,
 	getTimeRealOfSpecificStat,
+	putGuild,
+	deleteGuild,
 } from "../packages/deploy-commands/src/dataManager.js"
 import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration.js"
@@ -33,8 +35,18 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command)
 }
 
-client.once("ready", (client) => {
+client.on("ready", (client) => {
 	console.log(`Ready! Logged in as ${client.user.tag}`)
+})
+
+client.on("guildCreate", async (guild) => {
+	console.log(`Joined a new guild : ${guild.name}(${guild.id})`)
+	await putGuild(guild.id)
+})
+
+client.on("guildDelete", async (guild) => {
+	console.log(`Left a guild : ${guild.name}(${guild.id})`)
+	await deleteGuild(guild.id)
 })
 
 client.on("interactionCreate", async (interaction) => {

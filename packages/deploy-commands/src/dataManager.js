@@ -5,6 +5,70 @@ const userTablePath = path.join(__dirname, "../../../data/userTable.json")
 const userTableFile = fs.readFileSync(userTablePath)
 const userTable = JSON.parse(userTableFile)
 
+const guildTablePath = path.join(__dirname, "../../../data/guildTable.json")
+const guildTableFile = fs.readFileSync(guildTablePath)
+const guildTable = JSON.parse(guildTableFile)
+
+function putGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			newGuild = {
+				guildId: guildId,
+				premium: false,
+			}
+			newIndex = guildTable.guilds.length
+
+			guildTable.guilds[newIndex] = newGuild
+			await fs.writeFileSync(guildTablePath, JSON.stringify(guildTable))
+
+			console.log(guildTable)
+
+			resolve({ newGuild, newIndex })
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		let index = 0
+
+		for (const guild of guildTable.guilds) {
+			if (guild.guildId === guildId) {
+				resolve({ guild: guild, index: index })
+				return
+			}
+			index += 1
+		}
+
+		try {
+			const { newGuild, newIndex } = await putGuild(guildId)
+			resolve({ guild: newGuild, index: newIndex })
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function deleteGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const { _, index } = await getGuild(guildId)
+			console.log(guildTable)
+
+			guildTable.guilds.splice(index, 1)
+
+			console.log(guildTable)
+
+			await fs.writeFileSync(guildTablePath, JSON.stringify(guildTable))
+			resolve(true)
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
 function getUserTable() {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -283,6 +347,9 @@ async function addTimeRealToSpecificStat(userId, thisWeek, day, timeReal) {
 }
 
 module.exports = {
+	putGuild,
+	getGuild,
+	deleteGuild,
 	getUserTable,
 	setUserTable,
 	putUser,
