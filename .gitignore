@@ -1,3 +1,5 @@
 node_modules
 .env
 packages/deploy-commands/.env
+yarn.lock
+yarn-error.log
