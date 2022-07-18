@@ -1,11 +1,8 @@
+require("dotenv").config()
 const fs = require("node:fs")
 const path = require("node:path")
 const { REST } = require("@discordjs/rest")
 const { Routes } = require("discord-api-types/v9")
-const dotenv = require("dotenv")
-const dataManager = require("./dataManager")
-
-dotenv.config()
 
 const clientId = process.env.CLIENT_ID
 const guildId = process.env.GUILD_ID

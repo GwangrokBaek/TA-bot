@@ -119,7 +119,7 @@ module.exports = {
 						interaction.guild.id,
 						true,
 						dayInEng,
-						false
+						"false"
 					)
 				}
 			}
