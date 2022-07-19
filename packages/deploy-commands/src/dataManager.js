@@ -72,9 +72,7 @@ function deleteGuild(guildId) {
 			const result = await client.query(`delete from "guild" where guild_id='${guildId}'`)
 
 			if (result.rowCount === 0) {
-				throw new Error(
-					console.error(`[deleteGuild] Can't find anything with condition "${guildId}" from "guild" table`)
-				)
+				throw new Error(`[deleteGuild] Can't find anything with condition "${guildId}" from "guild" table`)
 			} else {
 				resolve(true)
 			}

@@ -65,7 +65,8 @@ client.on("interactionCreate", async (interaction) => {
 			console.error(error)
 		}
 	} else if (interaction.isSelectMenu()) {
-		const command = client.commands.get(interaction.message.interaction.commandName)
+		const messageArray = interaction.message.interaction.commandName.split(" ")
+		const command = client.commands.get(messageArray[0])
 
 		if (!command) return
 
