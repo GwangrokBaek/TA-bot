@@ -101,7 +101,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 					(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, false, "sun")) >=
 					getTimeGoal(newState.id, newState.guild.id)
 				) {
-					await setPassValueOfSpecificStat(newState.id, newState.guild.id, false, "sun", true)
+					await setPassValueOfSpecificStat(newState.id, newState.guild.id, false, "sun", "true")
 				}
 			} else {
 				await addTimeRealToSpecificStat(
@@ -124,7 +124,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 						newState.guild.id,
 						true,
 						convertIntToDay(today - 1),
-						true
+						"true"
 					)
 				}
 			}
@@ -141,7 +141,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 				(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today))) >=
 				getTimeGoal(newState.id, newState.guild.id)
 			) {
-				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), true)
+				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), "true")
 			}
 		} else if (now.isSame(before, "day")) {
 			await addTimeRealToSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), studyTime)
@@ -150,7 +150,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 				(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today))) >=
 				getTimeGoal(newState.id, newState.guild.id)
 			) {
-				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), true)
+				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), "true")
 			}
 		}
 	}
