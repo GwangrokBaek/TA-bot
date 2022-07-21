@@ -2,7 +2,7 @@ import fs from "fs"
 import path from "path"
 import * as url from "url"
 import dotenv from "dotenv"
-import { Client, Collection } from "discord.js"
+import { Client, Collection, Permissions } from "discord.js"
 import {
 	getLastJoinTimestamp,
 	setLastJoinTimestamp,
@@ -17,6 +17,7 @@ import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration.js"
 import { convertIntToDay } from "./dateHandler.js"
 import { initScheduler } from "./scheduler.js"
+import { addRoleToMember } from "../packages/deploy-commands/src/apiManager.js"
 
 dayjs.extend(duration)
 dotenv.config()
@@ -42,6 +43,13 @@ client.on("ready", (client) => {
 client.on("guildCreate", async (guild) => {
 	console.log(`Joined a new guild : ${guild.name}(${guild.id})`)
 	await putGuild(guild.id)
+	await guild.roles.create({
+		name: "Time2Study-admin",
+		permissions: [],
+	})
+
+	const role = guild.roles.cache.find((r) => r.name === "Time2Study-admin")
+	await addRoleToMember(guild.id, guild.ownerId, role.id)
 })
 
 client.on("guildDelete", async (guild) => {
@@ -99,7 +107,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 				await addTimeRealToSpecificStat(newState.id, newState.guild.id, false, "sun", studyTimeOflastDay)
 				if (
 					(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, false, "sun")) >=
-					getTimeGoal(newState.id, newState.guild.id)
+					(await getTimeGoal(newState.id, newState.guild.id))
 				) {
 					await setPassValueOfSpecificStat(newState.id, newState.guild.id, false, "sun", "true")
 				}
@@ -117,7 +125,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 						newState.guild.id,
 						false,
 						convertIntToDay(today - 1)
-					)) >= getTimeGoal(newState.id, newState.guild.id)
+					)) >= (await getTimeGoal(newState.id, newState.guild.id))
 				) {
 					await setPassValueOfSpecificStat(
 						newState.id,
@@ -139,7 +147,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 
 			if (
 				(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today))) >=
-				getTimeGoal(newState.id, newState.guild.id)
+				(await getTimeGoal(newState.id, newState.guild.id))
 			) {
 				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), "true")
 			}
@@ -148,7 +156,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 
 			if (
 				(await getTimeRealOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today))) >=
-				getTimeGoal(newState.id, newState.guild.id)
+				(await getTimeGoal(newState.id, newState.guild.id))
 			) {
 				await setPassValueOfSpecificStat(newState.id, newState.guild.id, true, convertIntToDay(today), "true")
 			}

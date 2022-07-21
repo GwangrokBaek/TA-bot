@@ -48,15 +48,21 @@ let setChannelForTime2StudyMenuOptions = []
 module.exports = {
 	data: new SlashCommandBuilder().setName("admin").setDescription("관리자 메뉴"),
 	async execute(interaction) {
-		const row = new MessageActionRow().addComponents(
-			new MessageSelectMenu()
-				.setCustomId("selectAdminMenu")
-				.setPlaceholder("선택된 명령이 없습니다")
-				.setMaxValues(1)
-				.addOptions(adminMenuOptions)
-		)
+		const member = interaction.guild.members.cache.get(interaction.user.id)
+		const isAdmin = member.roles.cache.some((role) => role.name === "Time2Study-admin")
+		if (isAdmin) {
+			const row = new MessageActionRow().addComponents(
+				new MessageSelectMenu()
+					.setCustomId("selectAdminMenu")
+					.setPlaceholder("선택된 명령이 없습니다")
+					.setMaxValues(1)
+					.addOptions(adminMenuOptions)
+			)
 
-		await interaction.reply({ content: "아래 메뉴에서 실행할 명령을 선택해주세요", components: [row] })
+			await interaction.reply({ content: "아래 메뉴에서 실행할 명령을 선택해주세요", components: [row] })
+		} else {
+			await interaction.reply({ content: "해당 명령을 사용할 권한이 없습니다. 관리자에게 문의해주세요!" })
+		}
 	},
 	async interact(interaction) {
 		try {
