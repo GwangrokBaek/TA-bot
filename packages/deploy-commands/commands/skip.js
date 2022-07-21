@@ -69,6 +69,7 @@ module.exports = {
 					skipDays.length === 0 ? "❌" : skipDays
 				}\n\n아래 메뉴에서 등록할 요일을 선택해주세요 (다중 선택 가능)`,
 				components: [row],
+				ephemeral: true,
 			})
 		} else if (interaction.options.getSubcommand() === "delete") {
 			const row = new MessageActionRow().addComponents(
@@ -84,6 +85,7 @@ module.exports = {
 					skipDays.length === 0 ? "❌" : skipDays
 				}\n\n아래 메뉴에서 삭제할 요일을 선택해주세요 (다중 선택 가능)`,
 				components: [row],
+				ephemeral: true,
 			})
 		}
 	},
@@ -102,6 +104,7 @@ module.exports = {
 			await interaction.editReply({
 				content: "성공적으로 등록되었습니다",
 				components: [],
+				ephemeral: true,
 			})
 		} else if (interaction.customId === "deleteskip") {
 			await interaction.deferUpdate()
@@ -126,6 +129,7 @@ module.exports = {
 			await interaction.editReply({
 				content: "성공적으로 삭제되었습니다",
 				components: [],
+				ephemeral: true,
 			})
 		}
 	},
