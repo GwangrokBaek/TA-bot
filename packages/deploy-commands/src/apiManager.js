@@ -72,4 +72,22 @@ function sendMessageToChannel(channelId, message) {
 	})
 }
 
-module.exports = { registerCommands, getUserInfo, getAllChannels, getChannelName, sendMessageToChannel }
+function addRoleToMember(guildId, memberId, roleId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await rest.put(Routes.guildMemberRole(guildId, memberId, roleId))
+			resolve(true)
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+module.exports = {
+	registerCommands,
+	getUserInfo,
+	getAllChannels,
+	getChannelName,
+	sendMessageToChannel,
+	addRoleToMember,
+}
