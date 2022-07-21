@@ -82,6 +82,87 @@ function deleteGuild(guildId) {
 	})
 }
 
+function setTime2StudyChannelOfGuild(guildId, channelId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+
+			const result = await client.query(
+				`UPDATE "guild" SET time2study_channel=${channelId} WHERE guild_id='${guildId}'`
+			)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[setTime2StudyChannelOfGuild] Can't find anything with condition "${guildId}" from "guild" table`
+				)
+			} else {
+				resolve(true)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getTime2StudyChannelOfGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+
+			const result = await client.query(`select time2study_channel from "guild" where guild_id='${guildId}'`)
+
+			if (result.rowCount === 0) {
+				console.log(`[getTime2StudyChannelOfGuild] Can't find time2study_channel from "guild" table`)
+				resolve(false)
+			} else {
+				resolve(result.rows[0].time2study_channel)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function setAutoWeeklyReportOfGuild(guildId, autoReport) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+
+			const result = await client.query(
+				`UPDATE "guild" SET auto_weekly_report=${autoReport} WHERE guild_id='${guildId}'`
+			)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[setAutoWeeklyReportOfGuild] Can't find anything with condition "${guildId}" from "guild" table`
+				)
+			} else {
+				resolve(true)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getAutoWeeklyReportOfGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+
+			const result = await client.query(`select auto_weekly_report from "guild" where guild_id='${guildId}'`)
+
+			if (result.rows[0].auto_weekly_report === true) {
+				resolve(true)
+			} else {
+				resolve(false)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
 function putUser(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -494,6 +575,10 @@ module.exports = {
 	existGuild,
 	getAllGuilds,
 	deleteGuild,
+	setTime2StudyChannelOfGuild,
+	getTime2StudyChannelOfGuild,
+	setAutoWeeklyReportOfGuild,
+	getAutoWeeklyReportOfGuild,
 	putUser,
 	existUser,
 	getAllUsersFromGuild,
