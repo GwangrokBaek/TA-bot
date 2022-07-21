@@ -55,7 +55,7 @@ async function initScheduler() {
 		console.log("End statScheduler")
 	})
 
-	autoReportScheduler = schedule.scheduleJob("1 * * * * *", async function () {
+	autoReportScheduler = schedule.scheduleJob("0 0 8 * * 1", async function () {
 		console.log("Start autoReportScheduler to report the stat of whole members automatically")
 		try {
 			const guilds = await getAllGuilds()
