@@ -7,8 +7,9 @@ import {
 	setStat,
 	getAutoWeeklyReportOfGuild,
 	getTime2StudyChannelOfGuild,
+	addPassFailSkipCountsToUser,
 } from "../packages/deploy-commands/src/dataManager.js"
-import { showWeeklyReport } from "../packages/deploy-commands/src/weeklyReportManager.js"
+import { showFameReport, showWeeklyReport } from "../packages/deploy-commands/src/weeklyReportManager.js"
 
 function cloneObject(obj) {
 	var clone = {}
@@ -39,13 +40,26 @@ async function initScheduler() {
 
 					stat.lastWeek = cloneObject(stat.thisWeek)
 
+					let passCounts = 0
+					let failCounts = 0
+					let skipCounts = 0
+
 					for (const day in stat.thisWeek) {
 						if (stat.thisWeek[day].pass !== "skip") {
+							if (stat.thisWeek[day].pass === "true") {
+								passCounts += 1
+							} else if (stat.thisWeek[day].pass === "false") {
+								failCounts += 1
+							}
+
 							stat.thisWeek[day].pass = "false"
+						} else {
+							skipCounts += 1
 						}
 						stat.thisWeek[day].timeReal = 0
 					}
 
+					addPassFailSkipCountsToUser(user.user_id, guild.guild_id, passCounts, failCounts, skipCounts)
 					setStat(user.user_id, guild.guild_id, stat)
 				}
 			}
@@ -67,8 +81,13 @@ async function initScheduler() {
 					const channelId = await getTime2StudyChannelOfGuild(guild.guild_id)
 
 					if (channelId) {
-						const reportMessage = await showWeeklyReport(guild.guild_id, false)
-						await sendMessageToChannel(channelId, reportMessage)
+						const reportStatMessage = await showWeeklyReport(guild.guild_id, false)
+						await sendMessageToChannel(channelId, reportStatMessage)
+						await sendMessageToChannel(channelId, "\n\n--------------------------------------------\n\n")
+						const reportFameMessage = await showFameReport(guild.guild_id)
+						await sendMessageToChannel(channelId, reportFameMessage)
+						await sendMessageToChannel(channelId, "\n\n--------------------------------------------\n\n")
+
 						console.log(
 							`Successfully send weeklyReport to channel : [${channelId}] of guild : [${guild.guild_id}]`
 						)

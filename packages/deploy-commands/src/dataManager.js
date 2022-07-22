@@ -163,6 +163,189 @@ function getAutoWeeklyReportOfGuild(guildId) {
 	})
 }
 
+function getMostTimeRealUserFromGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+
+			const result = await client.query(`select
+												u.user_id, u.sum_time_real
+											from
+												"user" u
+											inner join guild g on
+												u.guild_id = g.guild_id
+											where
+												g.guild_id = '${guildId}'
+											order by 2 desc
+											limit 1;`)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[getMostTimeRealUserFromGuild] Can't find anything with condition "${guildId}" from "guild" table`
+				)
+			} else {
+				resolve([result.rows[0].user_id, result.rows[0].sum_time_real])
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getMostPassCountsUserFromGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+
+			const result = await client.query(`select
+												u.user_id, u.pass_counts
+											from
+												"user" u
+											inner join guild g on
+												u.guild_id = g.guild_id
+											where
+												g.guild_id = '${guildId}'
+											order by 2 desc
+											limit 1;`)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[getMostTimeRealUserFromGuild] Can't find anything with condition "${guildId}" from "guild" table`
+				)
+			} else {
+				resolve([result.rows[0].user_id, result.rows[0].pass_counts])
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getRankFromGuild(guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existGuild(guildId)
+			const result = await client.query(`select
+												u.user_id, (u.sum_time_real + u.pass_counts * 1.5) as points
+											from
+												"user" u
+											inner join guild g on
+												u.guild_id = g.guild_id
+											where
+												g.guild_id = '${guildId}'
+											order by 2 desc;`)
+
+			if (result.rowCount === 0) {
+				throw new Error(`[getRankFromGuild] Can't find anything with condition "${guildId}" from "guild" table`)
+			} else {
+				resolve(result.rows)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getPassCountsFromUser(userId, guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function addPassFailSkipCountsToUser(userId, guildId, passCounts, failCounts, skipCounts) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+
+			const resultCountsQuery = await client.query(
+				`select pass_counts, fail_counts, skip_counts from "user" where user_unique_id='${userId}${guildId}'`
+			)
+
+			let passCountsBefore = Number(resultCountsQuery.rows[0].pass_counts)
+			let failCountsBefore = Number(resultCountsQuery.rows[0].fail_counts)
+			let skipCountsBefore = Number(resultCountsQuery.rows[0].skip_counts)
+
+			let resultCountsUpdate = await client.query(
+				`UPDATE "user" SET pass_counts='${passCountsBefore + passCounts}', fail_counts='${
+					failCountsBefore + failCounts
+				}', skip_counts='${skipCountsBefore + skipCounts}' WHERE user_unique_id='${userId}${guildId}'`
+			)
+
+			if (resultCountsUpdate.rowCount === 0) {
+				throw new Error(
+					`[addPassFailSkipCountsToUser] Can't find anything with condition "${userId}${guildId}" from "user" table`
+				)
+			} else {
+				resolve(true)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function addMorningCounts(userId, guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+
+			const resultQuery = await client.query(
+				`select morning_counts from "user" where user_unique_id='${userId}${guildId}'`
+			)
+
+			let morningCountsBefore = Number(resultQuery.rows[0].morning_counts)
+
+			let resultMorningCountsUpdate = await client.query(
+				`UPDATE "user" SET morning_counts='${
+					morningCountsBefore + 1
+				}' WHERE user_unique_id='${userId}${guildId}'`
+			)
+
+			if (resultMorningCountsUpdate.rowCount === 0) {
+				throw new Error(
+					`[addMorningCounts] Can't find anything with condition "${userId}${guildId}" from "user" table`
+				)
+			} else {
+				resolve(true)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function addNightCounts(userId, guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+
+			const resultQuery = await client.query(
+				`select night_counts from "user" where user_unique_id='${userId}${guildId}'`
+			)
+
+			let nightCountsBefore = Number(resultQuery.rows[0].night_counts)
+
+			let resultNightCountsUpdate = await client.query(
+				`UPDATE "user" SET night_counts='${nightCountsBefore + 1}' WHERE user_unique_id='${userId}${guildId}'`
+			)
+
+			if (resultNightCountsUpdate.rowCount === 0) {
+				throw new Error(
+					`[addMorningCounts] Can't find anything with condition "${userId}${guildId}" from "user" table`
+				)
+			} else {
+				resolve(true)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
 function putUser(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -530,36 +713,62 @@ async function addTimeRealToSpecificStat(userId, guildId, thisWeek, day, timeRea
 		try {
 			await existUser(userId, guildId)
 
-			let resultUpdate
+			let resultStatUpdate
+			let resultSumTimeRealUpdate
+
 			if (thisWeek === true) {
-				const resultQuery = await client.query(
+				const resultStatQuery = await client.query(
 					`select this_${day}_time_real from "stat" where stat_id='${userId}${guildId}'`
 				)
 
-				let timeRealBefore = Number(resultQuery.rows[0][`this_${day}_time_real`])
+				let timeRealBefore = Number(resultStatQuery.rows[0][`this_${day}_time_real`])
 
-				resultUpdate = await client.query(
+				resultStatUpdate = await client.query(
 					`UPDATE "stat" SET this_${day}_time_real='${
 						timeRealBefore + timeReal
 					}' WHERE stat_id='${userId}${guildId}'`
 				)
+
+				const resultUserQuery = await client.query(
+					`select sum_time_real from "user" where user_unique_id='${userId}${guildId}'`
+				)
+
+				let sumTimeRealBefore = Number(resultUserQuery.rows[0].sum_time_real)
+
+				resultSumTimeRealUpdate = await client.query(
+					`UPDATE "user" SET sum_time_real='${
+						sumTimeRealBefore + timeReal
+					}' WHERE user_unique_id='${userId}${guildId}'`
+				)
 			} else {
-				const resultQuery = await client.query(
+				const resultStatQuery = await client.query(
 					`select last_${day}_time_real from "stat" where stat_id='${userId}${guildId}'`
 				)
 
-				let timeRealBefore = Number(resultQuery.rows[0][`last_${day}_time_real`])
+				let timeRealBefore = Number(resultStatQuery.rows[0][`last_${day}_time_real`])
 
-				resultUpdate = await client.query(
+				resultStatUpdate = await client.query(
 					`UPDATE "stat" SET last_${day}_time_real='${
 						timeRealBefore + timeReal
 					}' WHERE stat_id='${userId}${guildId}'`
 				)
+
+				const resultUserQuery = await client.query(
+					`select sum_time_real from "user" where user_unique_id='${userId}${guildId}'`
+				)
+
+				let sumTimeRealBefore = Number(resultUserQuery.rows[0].sum_time_real)
+
+				resultSumTimeRealUpdate = await client.query(
+					`UPDATE "user" SET sum_time_real='${
+						sumTimeRealBefore + timeReal
+					}' WHERE user_unique_id='${userId}${guildId}'`
+				)
 			}
 
-			if (resultUpdate.rowCount === 0) {
+			if (resultStatUpdate.rowCount === 0 || resultSumTimeRealUpdate.rowCount === 0) {
 				throw new Error(
-					`[addTimeRealToSpecificStat] Can't find anything with condition "${userId}${guildId}" from "stat" table`
+					`[addTimeRealToSpecificStat] Can't find anything with condition "${userId}${guildId}" from "stat" table or "user" table`
 				)
 			} else {
 				resolve(true)
@@ -579,6 +788,13 @@ module.exports = {
 	getTime2StudyChannelOfGuild,
 	setAutoWeeklyReportOfGuild,
 	getAutoWeeklyReportOfGuild,
+	getMostTimeRealUserFromGuild,
+	getMostPassCountsUserFromGuild,
+	getPassCountsFromUser,
+	getRankFromGuild,
+	addPassFailSkipCountsToUser,
+	addMorningCounts,
+	addNightCounts,
 	putUser,
 	existUser,
 	getAllUsersFromGuild,

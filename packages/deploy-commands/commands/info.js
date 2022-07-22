@@ -61,19 +61,19 @@ module.exports = {
 				content: `⏰ 목표 공부 시간  ➡️  ${timeGoal ?? "0"} 시간\n\n✏️ 오늘 공부한 시간  ➡️  ${
 					timeReal.thisWeek[dayOfWeek].string
 				}\n\n🏝 쉬는 요일  ➡️  ${skipDays.length === 0 ? "❌" : skipDays}\n\n📊 이번주 통계  👇\n\n월요일  ${
-					stat.thisWeek.mon.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.mon.pass === "false" ? "❌" : stat.thisWeek.mon.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.mon.string}\n\n화요일  ${
-					stat.thisWeek.tue.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.tue.pass === "false" ? "❌" : stat.thisWeek.tue.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.tue.string}\n\n수요일  ${
-					stat.thisWeek.wed.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.wed.pass === "false" ? "❌" : stat.thisWeek.wed.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.wed.string}\n\n목요일  ${
-					stat.thisWeek.thu.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.thu.pass === "false" ? "❌" : stat.thisWeek.thu.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.thu.string}\n\n금요일  ${
-					stat.thisWeek.fri.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.fri.pass === "false" ? "❌" : stat.thisWeek.fri.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.fri.string}\n\n토요일  ${
-					stat.thisWeek.sat.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.sat.pass === "false" ? "❌" : stat.thisWeek.sat.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.sat.string}\n\n일요일  ${
-					stat.thisWeek.sun.pass === "false" ? "❌" : "✅"
+					stat.thisWeek.sun.pass === "false" ? "❌" : stat.thisWeek.sun.pass === "skip" ? "🏝" : "✅"
 				}  ➡️  ${timeReal.thisWeek.sun.string}`,
 				ephemeral: true,
 			})
