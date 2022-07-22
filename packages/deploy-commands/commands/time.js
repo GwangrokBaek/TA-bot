@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders")
+const dayjs = require("dayjs")
 const dataManager = require("../src/dataManager")
+const dateManager = import("../../../src/dateHandler.js")
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,9 +23,21 @@ module.exports = {
 				throw new Error()
 			}
 
+			const now = dayjs()
+			const today = now.day()
+			const todayInEng = (await dateManager).convertIntToDay(today)
+
 			await dataManager.setTimeGoal(userId, guildId, hours)
+			if (
+				(await dataManager.getTimeRealOfSpecificStat(userId, guildId, true, todayInEng)) <
+				(await dataManager.getTimeGoal(userId, guildId))
+			) {
+				await dataManager.setPassValueOfSpecificStat(userId, guildId, true, todayInEng, "false")
+			} else {
+				await dataManager.setPassValueOfSpecificStat(userId, guildId, true, todayInEng, "true")
+			}
 			await interaction.reply({
-				content: `하루 목표 공부 시간이 ${hours} 시간으로 설정되었습니다!`,
+				content: `오늘부터 하루 목표 공부 시간이 ${hours} 시간으로 설정되었습니다! (이전 날짜에는 적용되지 않습니다)`,
 				ephemeral: true,
 			})
 		} catch (e) {

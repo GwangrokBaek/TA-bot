@@ -12,6 +12,8 @@ import {
 	getTimeRealOfSpecificStat,
 	putGuild,
 	deleteGuild,
+	addMorningCounts,
+	addNightCounts,
 } from "../packages/deploy-commands/src/dataManager.js"
 import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration.js"
@@ -88,8 +90,19 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("voiceStateUpdate", async (oldState, newState) => {
 	if (!oldState.selfVideo && newState.selfVideo) {
-		const now = dayjs().format()
-		setLastJoinTimestamp(newState.id, newState.guild.id, now)
+		const now = dayjs()
+
+		const before = await getLastJoinTimestamp(newState.id, newState.guild.id)
+
+		if (now.isAfter(before, "day")) {
+			if (now.get("h") <= 10) {
+				await addMorningCounts(newState.id, newState.guild.id)
+			} else if (now.get("h") >= 21) {
+				await addNightCounts(newState.id, newState.guild.id)
+			}
+		}
+
+		setLastJoinTimestamp(newState.id, newState.guild.id, now.format())
 	} else if (oldState.selfVideo && oldState.channelId && (!newState.selfVideo || !newState.channelId)) {
 		const now = dayjs()
 		const before = dayjs(await getLastJoinTimestamp(newState.id, newState.guild.id))
