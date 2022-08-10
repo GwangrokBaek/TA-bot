@@ -117,8 +117,11 @@ module.exports = {
 				const badges = await dataManager.getBadges(interaction.user.id, interaction.guild.id)
 
 				let badgeString = ""
-				for (badge of badges) {
-					badgeString += `${badgeManager.badgeInImage[badge]} ${badgeManager.badgeInKorean[badge]}\n${badgeManager.badgeExplanation[badge]}\n\n`
+
+				if (badges.length !== 0) {
+					for (badge of badges) {
+						badgeString += `${badgeManager.badgeInImage[badge]} ${badgeManager.badgeInKorean[badge]}\n${badgeManager.badgeExplanation[badge]}\n\n`
+					}
 				}
 
 				await interaction.update({
