@@ -118,7 +118,7 @@ module.exports = {
 
 				let badgeString = ""
 
-				if (badges.length !== 0) {
+				if (badges !== null && badges.length !== 0) {
 					for (badge of badges) {
 						badgeString += `${badgeManager.badgeInImage[badge]} ${badgeManager.badgeInKorean[badge]}\n${badgeManager.badgeExplanation[badge]}\n\n`
 					}
