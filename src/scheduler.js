@@ -1,5 +1,6 @@
 import schedule from "node-schedule"
 import { sendMessageToChannel } from "../packages/deploy-commands/src/apiManager.js"
+import { checkBadgeNeedToAdd } from "../packages/deploy-commands/src/badgeManager.js"
 import {
 	getStat,
 	getAllGuilds,
@@ -8,6 +9,9 @@ import {
 	getAutoWeeklyReportOfGuild,
 	getTime2StudyChannelOfGuild,
 	addPassFailSkipCountsToUser,
+	getAllBadgeRelatedData,
+	addBadge,
+	getBadges,
 } from "../packages/deploy-commands/src/dataManager.js"
 import { showFameReport, showWeeklyReport } from "../packages/deploy-commands/src/weeklyReportManager.js"
 
@@ -26,6 +30,7 @@ function cloneObject(obj) {
 
 let statScheduler
 let autoReportScheduler
+let badgeCollectScheduler
 
 async function initScheduler() {
 	statScheduler = schedule.scheduleJob("0 0 0 * * 1", async function () {
@@ -69,7 +74,7 @@ async function initScheduler() {
 		console.log("End statScheduler")
 	})
 
-	autoReportScheduler = schedule.scheduleJob("0 0 8 * * 1", async function () {
+	autoReportScheduler = schedule.scheduleJob("0 0 8 ? * 1 *", async function () {
 		console.log("Start autoReportScheduler to report the stat of whole members automatically")
 		try {
 			const guilds = await getAllGuilds()
@@ -98,6 +103,24 @@ async function initScheduler() {
 			console.error(e)
 		}
 		console.log("End autoReportScheduler")
+	})
+
+	badgeCollectScheduler = schedule.scheduleJob("0 0 0/1 1/1 * ? *", async function () {
+		console.log("Start badgeCollectScheduler to collect new badges of members automatically")
+		try {
+			const guilds = await getAllGuilds()
+
+			for (const guild of guilds) {
+				const users = await getAllUsersFromGuild(guild.guild_id)
+				for (const user of users) {
+					const badgeRelatedData = await getAllBadgeRelatedData(user.user_id, guild.guild_id)
+					await checkBadgeNeedToAdd(badgeRelatedData, user.user_id, guild.guild_id)
+				}
+			}
+		} catch (e) {
+			console.log(e)
+		}
+		console.log("End badgeCollectScheduler")
 	})
 }
 
