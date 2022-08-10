@@ -346,6 +346,70 @@ function addNightCounts(userId, guildId) {
 	})
 }
 
+function getAllBadgeRelatedData(userId, guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+
+			const result = await client.query(
+				`select sum_time_real, pass_counts, fail_counts, skip_counts, night_counts, morning_counts, first_grade_counts, last_grade_counts from "user" where user_unique_id='${userId}${guildId}'`
+			)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[getAllBadgeRelatedData] Can't find anything with condition "${userId}${guildId}" from "user" table`
+				)
+			} else {
+				resolve(result.rows)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function getBadges(userId, guildId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+
+			const result = await client.query(`select badges from "user" where user_unique_id='${userId}${guildId}'`)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[getBadges] Can't find anything with condition "${userId}${guildId}" from "user" table`
+				)
+			} else {
+				resolve(result.rows[0].badges)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
+function addBadge(userId, guildId, badge) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			await existUser(userId, guildId)
+
+			const result = await client.query(
+				`UPDATE "user" SET badges = (badges || ARRAY['${badge}']) WHERE user_unique_id='${userId}${guildId}'`
+			)
+
+			if (result.rowCount === 0) {
+				throw new Error(
+					`[addBadges] Can't find anything with condition "${userId}${guildId}" from "user" table`
+				)
+			} else {
+				resolve(result.rows)
+			}
+		} catch (e) {
+			reject(e)
+		}
+	})
+}
+
 function putUser(userId, guildId) {
 	return new Promise(async (resolve, reject) => {
 		try {
@@ -795,6 +859,9 @@ module.exports = {
 	addPassFailSkipCountsToUser,
 	addMorningCounts,
 	addNightCounts,
+	getAllBadgeRelatedData,
+	getBadges,
+	addBadge,
 	putUser,
 	existUser,
 	getAllUsersFromGuild,

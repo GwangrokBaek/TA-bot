@@ -25,7 +25,7 @@ dayjs.extend(duration)
 dotenv.config()
 
 const token = process.env.DISCORD_TOKEN
-const client = new Client({ intents: 641 })
+export const client = new Client({ intents: 641 })
 client.commands = new Collection()
 
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url))
@@ -74,7 +74,7 @@ client.on("interactionCreate", async (interaction) => {
 		} catch (error) {
 			console.error(error)
 		}
-	} else if (interaction.isSelectMenu()) {
+	} else if (interaction.isSelectMenu() || interaction.isButton()) {
 		const messageArray = interaction.message.interaction.commandName.split(" ")
 		const command = client.commands.get(messageArray[0])
 
