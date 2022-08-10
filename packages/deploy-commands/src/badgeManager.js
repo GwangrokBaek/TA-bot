@@ -100,7 +100,7 @@ function addBadgeToUser(badge, userId, guildId) {
 			await dataManager.addBadge(userId, guildId, badge)
 			const user = (await client).client.users.fetch(userId)
 			const result = (await user).send(
-				`🥳  축하합니다! ${badgeInImage[badge]} ${badgeInKorean[badge]} 뱃지를 획득하셨습니다 🙌\n\n${badgeExplanation[badge]}\n\n/info 명령어로 획득한 뱃지를 확인해보세요!`
+				`🥳  축하합니다! ${badgeInImage[badge]} ${badgeInKorean[badge]} 뱃지를 획득하셨습니다 🙌\n\n${badgeExplanation[badge]}\n\n/info 명령어로 획득한 뱃지를 확인해보세요!\n\n`
 			)
 			resolve(true)
 		} catch (e) {
